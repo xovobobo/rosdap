@@ -17,7 +17,9 @@ local launch_vimspector = function(configurations)
     local json_obj = vim.fn.json_decode(configurations)
     
     for key, cfg in ipairs(json_obj['python']) do
-        print(key, vim.inspect(cfg))
+        --print(key, vim.inspect(cfg))
+        --print(vim.inspect(cfg['roslaunchpy']['configuration']['name']))
+        vim.fn['vimspector#NewSession'](cfg['roslaunchpy']['configuration']['name'])
         vim.fn['vimspector#LaunchWithConfigurations'](cfg)
     end
 end
