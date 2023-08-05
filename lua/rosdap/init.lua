@@ -15,16 +15,20 @@ end
 
 local launch_vimspector = function(configurations)
     local json_obj = vim.fn.json_decode(configurations)
-    
-    for key, cfg in ipairs(json_obj['python']) do
-        --print(key, vim.inspect(cfg))
-        --print(vim.inspect(cfg['roslaunchpy']['configuration']['name']))
+    local current_tabpage = vim.api.nvim_tabpage_get_number(0)
+    local current_buff = vim.api.nvim_get_current_buf()
+    for _, cfg in ipairs(json_obj['python']) do
         vim.fn['vimspector#NewSession'](cfg['roslaunchpy']['configuration']['name'])
+        vim.cmd('badd ' .. cfg['roslaunchpy']['configuration']['program'])
+        vim.cmd('buffer ' .. cfg['roslaunchpy']['configuration']['program'])
         vim.fn['vimspector#LaunchWithConfigurations'](cfg)
+        vim.cmd('TabooRename ROSDAP-' .. cfg['roslaunchpy']['configuration']['name'])
+        vim.api.nvim_set_current_tabpage(current_tabpage)
+        vim.api.nvim_set_current_buf(current_buff)
     end
 end
 
-Get_ros_config = function()
+function Rosdap_launch()
     local python_get_cfg_path = vim.g.rosdap_dir .. "ros_get_config.py"
     local roslaunch_file = vim.fn.getcwd() .. "/.roslaunch"
 
@@ -32,9 +36,4 @@ Get_ros_config = function()
         local configurations = getpython_output(python_get_cfg_path, roslaunch_file)
         launch_vimspector(configurations)
     end
-end,
-
-
-    
-
-vim.api.nvim_set_keymap('n', '<Leader>tc', ':lua Get_ros_config()<CR>', { noremap = true, silent = true, desc="Get ros configuration" })
+end
