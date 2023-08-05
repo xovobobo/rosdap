@@ -56,4 +56,6 @@ if action == 'launch':
 
 sys.stdout = sys.__stdout__
 
+
+result = str(result).replace("'", '"')
 print(result)
