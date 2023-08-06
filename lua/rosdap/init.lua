@@ -1,4 +1,4 @@
-vim.g.rosdap_dir = vim.fn.stdpath('data') .. '/lazy/rosdap/'
+vim.g.rosdap_dir = vim.fn.stdpath('data') .. '/lazy/rosdap.nvim/'
 
 local get_bpts = function ()
     return vim.api.nvim_call_function('vimspector#GetBreakpointsAsQuickFix', {})
