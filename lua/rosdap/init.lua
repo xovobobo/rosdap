@@ -1,5 +1,17 @@
 vim.g.rosdap_dir = vim.fn.stdpath('data') .. '/lazy/rosdap/'
 
+
+local get_bpts = function ()
+    return vim.api.nvim_call_function('vimspector#GetBreakpointsAsQuickFix', {})
+end
+
+local set_bpts = function(bpts)
+    for _, bpt in ipairs(bpts) do
+        vim.api.nvim_call_function('vimspector#SetLineBreakpoint', {bpt['filename'], bpt['lnum']})
+        -- print(bpt)
+    end
+end
+
 local getpython_output = function (path, arg)
     return vim.fn.system("python3 " .. path .. " " .. arg)
 end
@@ -17,11 +29,14 @@ local launch_vimspector = function(configurations)
     local json_obj = vim.fn.json_decode(configurations)
     local current_tabpage = vim.api.nvim_tabpage_get_number(0)
     local current_buff = vim.api.nvim_get_current_buf()
+    local bpts = get_bpts()
     for _, cfg in ipairs(json_obj['python']) do
+        -- print(vim.inspect(cfg))
         vim.fn['vimspector#NewSession'](cfg['roslaunchpy']['configuration']['name'])
         vim.cmd('badd ' .. cfg['roslaunchpy']['configuration']['program'])
         vim.cmd('buffer ' .. cfg['roslaunchpy']['configuration']['program'])
         vim.fn['vimspector#LaunchWithConfigurations'](cfg)
+        set_bpts(bpts)
         vim.cmd('TabooRename ROSDAP-' .. cfg['roslaunchpy']['configuration']['name'])
         vim.api.nvim_set_current_tabpage(current_tabpage)
         vim.api.nvim_set_current_buf(current_buff)
