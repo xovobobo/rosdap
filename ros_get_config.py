@@ -1,14 +1,10 @@
 import os
 import sys
-
 import roslaunch
 import rospy
 import json
 import roslaunch.xmlloader as xmlloader
 import roslib
-
-
-
 
 roslaunch_cfg = sys.argv[1]
 
@@ -39,7 +35,7 @@ if action == 'launch':
     for node in ros_config.nodes:
         cli_path = roslib.packages.find_node(node.package, node.type)[0]
         cli_args = []
-
+        ns = node.namespace
         if node.args:
             for arg in node.args.split(' '):
                 cli_args.append(arg)
@@ -48,7 +44,7 @@ if action == 'launch':
             cli_args.append(remap[0] + ":=" + remap[1])
 
         cli_args.append(f'__name:={node.name}')
-
+        cli_args.append(f'__ns:={ns}')
         if node.type.endswith('py') or node.type.endswith('pyw'):
             result['python'].append({'roslaunchpy': {'adapter':'debugpy', 'configuration': {'name': node.name, 'type': 'python', 'request': 'launch', 'program': cli_path, 'args': cli_args}}})
         else:
